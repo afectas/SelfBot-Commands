@@ -22,7 +22,6 @@ client.selfConfig = {
     rpcTwitch: "https://twitch.tv" 
 };
 
-// --- CARGADOR DE COMANDOS (Command Handler) ---
 const commandsPath = path.join(__dirname, "commands");
 if (fs.existsSync(commandsPath)) {
     const commandFolders = fs.readdirSync(commandsPath);
@@ -39,13 +38,12 @@ if (fs.existsSync(commandsPath)) {
                     client.commands.set(command.name, command);
                 }
             } catch (error) {
-                console.error(`❌ Error al cargar ${file}:`, error);
+                console.error(`[X]  ERROR LOADING... ${file}:`, error);
             }
         }
     }
 }
 
-// --- SISTEMA DE STATUS ROTATOR & RPC ---
 const updatePresence = () => {
     if (!client.selfConfig.rotatorEnabled) return;
 
@@ -60,28 +58,22 @@ const updatePresence = () => {
         .setDetails(rpcText)
         .setStartTimestamp(Date.now());
 
-    // Aplicar el status y el RPC
     client.user.setPresence({ 
         activities: [r, { name: currentStatus, type: "WATCHING" }] 
     });
 
-    // Avanzar al siguiente mensaje del rotator
     client.selfConfig.currentIndex = (currentIndex + 1) % statusMessages.length;
 };
 
-// --- EVENTO READY ---
 client.on("ready", async () => {
-    console.log(`✅ Selfbot conectado como: ${client.user.tag}`);
-    console.log(`📂 Comandos cargados: ${client.commands.size}`);
+    console.log(`[X]  SELFBOT CONNECTED IN: ${client.user.tag}`);
+    console.log(`[X]  COMMANDS LOADEDS ${client.commands.size}`);
     
-    // Iniciar el ciclo cada 15 segundos
     updatePresence();
     setInterval(updatePresence, 15000);
 });
 
-// --- EVENTO MESSAGE (Manejador de Comandos) ---
 client.on("messageCreate", async (message) => {
-    // IMPORTANTE: Un selfbot solo responde a TUS mensajes para evitar baneos rápidos
     if (message.author.id !== client.user.id) return;
     if (!message.content.startsWith(client.selfConfig.prefix)) return;
 
@@ -96,12 +88,11 @@ client.on("messageCreate", async (message) => {
     try {
         await command.execute(client, message, args);
     } catch (error) {
-        console.error("Error en comando:", error);
-        await message.edit(`❌ **Error:** \`${error.message}\``).catch(() => {});
+        console.error("[X]  ERROR:", error);
+        await message.edit(`\`${error.message}\``).catch(() => {});
     }
 });
 
-// Login
 client.login(client.selfConfig.token).catch(err => {
-    console.error("❌ Error de login (Token inválido):", err);
+    console.error("[X]   ERROR LOGGIN  (INVALID TOKEN):", err);
 });
