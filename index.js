@@ -1,6 +1,7 @@
 import { Client, Collection, RichPresence } from "discord.js-selfbot-v13";
 import fs from "fs";
 import path from "path";
+import chalk from "chalk";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -66,8 +67,16 @@ const updatePresence = () => {
 };
 
 client.on("ready", async () => {
-    console.log(`[X]  SELFBOT CONNECTED IN: ${client.user.tag}`);
-    console.log(`[X]  COMMANDS LOADEDS ${client.commands.size}`);
+    console.clear();
+    console.log(chalk.magentaBright(`
+    ╔══════════════════════════════════════╗
+    ║          BOT CONECTADO               ║
+    ╚══════════════════════════════════════╝
+    
+    [$] USER: ${chalk.white.bold(client.user.tag)}
+    [$] ID: ${chalk.white(client.user.id)}
+    [$] COMMANDS: ${chalk.white(client.commands.size)}`)};
+  
     
     updatePresence();
     setInterval(updatePresence, 15000);
